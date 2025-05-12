@@ -27,6 +27,8 @@ IAF_DISTANCE = 25 #km, from FAF
 
 IAF_ANGLE = 90 #degrees, symmetrical around FAF
 
+DELETE = False
+
 def init_plugin():
     sink = Sink()
     # Configuration parameters
@@ -43,10 +45,15 @@ class Sink(core.Entity):
     def __init__(self):
         super().__init__()
         self.runway = RUNWAY
+        self.delete = DELETE
         self._set_terminal_conditions()
+        
         with self.settrafarrays():
-             self.last_lat = np.array([])
-             self.last_lon = np.array([])
+            self.last_lat = np.array([])
+            self.last_lon = np.array([])
+
+        with traf.settrafarrays():
+            traf.control_mode = np.array([]) # 0 = CR, 1 = Merge
 
     @core.timed_function(name='Sink', dt=5)
     def update(self):
@@ -58,6 +65,7 @@ class Sink(core.Entity):
         super().create(n)
         self.last_lat[-n:] = traf.lat[-n:]
         self.last_lon[-n:] = traf.lon[-n:]
+        traf.control_mode[-n:] = np.zeros(n)
 
     def _set_terminal_conditions(self):
             """
@@ -103,9 +111,11 @@ class Sink(core.Entity):
             # line_restrict = Path(np.reshape(shapes['RESTRICT'].coordinates, (len(shapes['RESTRICT'].coordinates) // 2, 2)))
 
             if line_sink.intersects_path(line_ac):
-                stack.stack(f'DEL {id}')
+                if self.delete:
+                    stack.stack(f'DEL {id}')
+                else:
+                    traf.control_mode[idx] = 1
 
     def _update_positions(self):
         self.last_lat = traf.lat
         self.last_lon = traf.lon
-
