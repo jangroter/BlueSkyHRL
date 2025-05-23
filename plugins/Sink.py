@@ -22,10 +22,10 @@ RUNWAYS_SCHIPHOL_FAF = {
 
 RUNWAY = ['27','18R']
 
-FAF_DISTANCE = 10 #km
-IAF_DISTANCE = 25 #km, from FAF
+FAF_DISTANCE = 25 #km
+IAF_DISTANCE = 30 #km, from FAF
 
-IAF_ANGLE = 90 #degrees, symmetrical around FAF
+IAF_ANGLE = 60 #degrees, symmetrical around FAF
 
 DELETE = False
 
